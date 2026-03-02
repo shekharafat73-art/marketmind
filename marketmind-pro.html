@@ -1,0 +1,2288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MarketMind AI — Institutional Crypto Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #020304;
+  --bg: #070a0d;
+  --bg2: #0c1014;
+  --panel: #0f1419;
+  --panel2: #141c24;
+  --border: #1a2332;
+  --border2: #243040;
+  --border3: #2e3f52;
+  --cyan: #00d4ff;
+  --cyan2: #0099cc;
+  --green: #00ff88;
+  --green2: #00cc6a;
+  --red: #ff3355;
+  --red2: #cc2244;
+  --amber: #ffaa00;
+  --amber2: #cc8800;
+  --white: #e8f0f8;
+  --gray1: #a0b4c8;
+  --gray2: #607080;
+  --gray3: #3a4a5a;
+  --gray4: #1e2a36;
+  --usdt: #26a17b;
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html, body { height:100%; overflow:hidden; }
+
+body {
+  background: var(--bg);
+  color: var(--white);
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+/* Noise texture overlay */
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:0;
+  opacity:0.4;
+}
+
+/* Subtle grid */
+body::after {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.018) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events:none;
+  z-index:0;
+}
+
+/* ── TOP STATUS BAR ── */
+.statusbar {
+  position:relative; z-index:20;
+  height:26px;
+  background: var(--black);
+  border-bottom: 1px solid var(--border);
+  display:flex;
+  align-items:center;
+  padding:0 16px;
+  gap:0;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:10px;
+  color: var(--gray2);
+  overflow:hidden;
+}
+
+.sb-item {
+  padding:0 14px;
+  border-right:1px solid var(--border);
+  height:100%;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  white-space:nowrap;
+}
+
+.sb-item:first-child { padding-left:0; }
+
+.sb-live {
+  width:5px; height:5px;
+  background:var(--green);
+  border-radius:50%;
+  box-shadow: 0 0 6px var(--green);
+  animation: pulse-live 2s ease-in-out infinite;
+}
+
+@keyframes pulse-live {
+  0%,100%{opacity:1;} 50%{opacity:0.3;}
+}
+
+.sb-up { color:var(--green); }
+.sb-dn { color:var(--red); }
+.sb-neu { color:var(--cyan); }
+
+.sb-ticker { margin-left:3px; font-weight:600; color:var(--white); }
+.sb-spacer { flex:1; }
+
+.sb-time {
+  color:var(--gray2);
+  letter-spacing:0.5px;
+}
+
+/* ── HEADER ── */
+header {
+  position:relative; z-index:20;
+  height:52px;
+  background: rgba(7,10,13,0.97);
+  border-bottom: 1px solid var(--border);
+  display:flex;
+  align-items:center;
+  padding:0 20px;
+  gap:0;
+  backdrop-filter:blur(16px);
+}
+
+.logo-wrap {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding-right:24px;
+  border-right:1px solid var(--border);
+  margin-right:20px;
+}
+
+.logo-mark {
+  position:relative;
+  width:34px; height:34px;
+}
+
+.logo-mark svg {
+  width:100%; height:100%;
+}
+
+.logo-name {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:16px;
+  font-weight:700;
+  letter-spacing:1px;
+  color:var(--white);
+}
+
+.logo-name span { color:var(--cyan); }
+
+.logo-sub {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:8px;
+  color:var(--gray2);
+  letter-spacing:3px;
+  margin-top:1px;
+}
+
+.nav-tabs {
+  display:flex;
+  height:100%;
+}
+
+.nav-tab {
+  padding:0 18px;
+  height:100%;
+  display:flex;
+  align-items:center;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:10px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  color:var(--gray2);
+  cursor:pointer;
+  border-bottom:2px solid transparent;
+  transition:all 0.2s;
+  user-select:none;
+}
+
+.nav-tab:hover { color:var(--white); }
+.nav-tab.active { color:var(--cyan); border-bottom-color:var(--cyan); }
+
+.header-right {
+  margin-left:auto;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.tier-badge {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px;
+  letter-spacing:2px;
+  padding:4px 10px;
+  border-radius:2px;
+  background:rgba(0,212,255,0.08);
+  border:1px solid rgba(0,212,255,0.25);
+  color:var(--cyan);
+}
+
+.btn {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:10px;
+  letter-spacing:1px;
+  padding:8px 18px;
+  border-radius:2px;
+  cursor:pointer;
+  border:none;
+  transition:all 0.18s;
+}
+
+.btn-outline {
+  background:transparent;
+  border:1px solid var(--border3);
+  color:var(--gray1);
+}
+.btn-outline:hover { border-color:var(--gray2); color:var(--white); }
+
+.btn-primary {
+  background:var(--cyan);
+  color:var(--black);
+  font-weight:700;
+}
+.btn-primary:hover {
+  background:#33ddff;
+  box-shadow:0 0 24px rgba(0,212,255,0.35);
+}
+
+.btn-usdt {
+  background:var(--usdt);
+  color:#fff;
+  font-weight:700;
+}
+.btn-usdt:hover {
+  background:#2dbb8f;
+  box-shadow:0 0 20px rgba(38,161,123,0.4);
+}
+
+/* ── MAIN LAYOUT ── */
+.workspace {
+  position:relative; z-index:1;
+  flex:1;
+  display:flex;
+  overflow:hidden;
+}
+
+/* ── LEFT PANEL ── */
+.left-panel {
+  width:210px;
+  flex-shrink:0;
+  border-right:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  background:var(--panel);
+  overflow:hidden;
+}
+
+.panel-header {
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px;
+  letter-spacing:2px;
+  color:var(--gray3);
+  text-transform:uppercase;
+  background:var(--bg2);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.panel-header-action {
+  color:var(--cyan);
+  cursor:pointer;
+  font-size:8px;
+  letter-spacing:1px;
+}
+
+.ticker-list { overflow-y:auto; }
+
+.ticker-row {
+  padding:9px 14px;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;
+  display:grid;
+  grid-template-columns:1fr auto;
+  grid-template-rows:1fr 1fr;
+  gap:2px 0;
+  transition:background 0.15s;
+  position:relative;
+}
+
+.ticker-row::before {
+  content:'';
+  position:absolute;
+  left:0; top:0; bottom:0;
+  width:2px;
+  background:transparent;
+  transition:background 0.15s;
+}
+
+.ticker-row:hover { background:var(--panel2); }
+.ticker-row:hover::before { background:var(--gray3); }
+.ticker-row.active { background:rgba(0,212,255,0.04); }
+.ticker-row.active::before { background:var(--cyan); }
+
+.tk-symbol {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:12px;
+  font-weight:600;
+  color:var(--white);
+}
+
+.tk-price {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:11px;
+  color:var(--gray1);
+  text-align:right;
+}
+
+.tk-name {
+  font-size:10px;
+  color:var(--gray2);
+}
+
+.tk-change {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:10px;
+  font-weight:600;
+  text-align:right;
+}
+
+.up { color:var(--green); }
+.dn { color:var(--red); }
+
+/* Sparkline placeholder */
+.sparkline {
+  grid-column:1/-1;
+  height:18px;
+  margin-top:3px;
+  opacity:0.6;
+}
+
+.divider {
+  height:1px;
+  background:var(--border);
+  margin:0;
+}
+
+.news-feed { flex:1; overflow-y:auto; }
+
+.news-row {
+  padding:10px 14px;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;
+  transition:background 0.15s;
+}
+.news-row:hover { background:var(--panel2); }
+
+.news-pill {
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:8px;
+  letter-spacing:1px;
+  padding:2px 7px;
+  border-radius:1px;
+  margin-bottom:5px;
+}
+.pill-bull { background:rgba(0,255,136,0.1); color:var(--green); border:1px solid rgba(0,255,136,0.2); }
+.pill-bear { background:rgba(255,51,85,0.1); color:var(--red); border:1px solid rgba(255,51,85,0.2); }
+.pill-neutral { background:rgba(0,212,255,0.08); color:var(--cyan); border:1px solid rgba(0,212,255,0.2); }
+
+.news-title {
+  font-size:11px;
+  color:var(--gray1);
+  line-height:1.45;
+  margin-bottom:3px;
+}
+
+.news-meta {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px;
+  color:var(--gray3);
+}
+
+.pro-gate {
+  margin:12px;
+  padding:14px;
+  border:1px solid rgba(38,161,123,0.3);
+  border-radius:3px;
+  background:rgba(38,161,123,0.04);
+  text-align:center;
+}
+
+.pro-gate-icon { font-size:20px; margin-bottom:8px; }
+.pro-gate-text { font-size:10px; color:var(--gray2); line-height:1.5; margin-bottom:10px; }
+
+.btn-sm {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px;
+  letter-spacing:1px;
+  padding:6px 12px;
+  border-radius:2px;
+  cursor:pointer;
+  border:none;
+  width:100%;
+}
+
+/* ── CHAT CENTER ── */
+.chat-center {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  position:relative;
+}
+
+.chat-toolbar {
+  height:40px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  padding:0 16px;
+  gap:12px;
+  background:var(--bg2);
+  flex-shrink:0;
+}
+
+.toolbar-label {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px;
+  letter-spacing:2px;
+  color:var(--gray3);
+  text-transform:uppercase;
+}
+
+.toolbar-chip {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px;
+  padding:3px 10px;
+  border-radius:1px;
+  letter-spacing:1px;
+}
+
+.chip-active {
+  background:rgba(0,212,255,0.1);
+  border:1px solid rgba(0,212,255,0.3);
+  color:var(--cyan);
+}
+
+.chip-model {
+  background:rgba(0,255,136,0.08);
+  border:1px solid rgba(0,255,136,0.2);
+  color:var(--green);
+  cursor:pointer;
+  transition:all 0.2s;
+}
+
+.chip-model:hover { background:rgba(0,255,136,0.15); }
+
+.toolbar-spacer { flex:1; }
+
+.toolbar-action {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px;
+  color:var(--gray2);
+  cursor:pointer;
+  padding:3px 8px;
+  border-radius:1px;
+  transition:all 0.15s;
+  letter-spacing:1px;
+}
+
+.toolbar-action:hover { background:var(--panel2); color:var(--white); }
+
+/* Messages */
+.messages-wrap {
+  flex:1;
+  overflow-y:auto;
+  padding:0;
+  scrollbar-width:thin;
+  scrollbar-color:var(--border3) transparent;
+}
+
+.messages-wrap::-webkit-scrollbar { width:3px; }
+.messages-wrap::-webkit-scrollbar-track { background:transparent; }
+.messages-wrap::-webkit-scrollbar-thumb { background:var(--border3); }
+
+/* Welcome screen */
+.welcome-screen {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  height:100%;
+  padding:40px 20px;
+  gap:0;
+}
+
+.welcome-graphic {
+  margin-bottom:24px;
+  position:relative;
+}
+
+.hex-ring {
+  animation: spin-slow 20s linear infinite;
+}
+
+@keyframes spin-slow {
+  from { transform:rotate(0deg); }
+  to { transform:rotate(360deg); }
+}
+
+.welcome-title {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:26px;
+  font-weight:700;
+  letter-spacing:4px;
+  color:var(--white);
+  margin-bottom:8px;
+  text-align:center;
+}
+
+.welcome-title span { color:var(--cyan); }
+
+.welcome-sub {
+  font-size:12px;
+  color:var(--gray2);
+  text-align:center;
+  max-width:460px;
+  line-height:1.7;
+  margin-bottom:32px;
+}
+
+.quickstart-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  width:100%;
+  max-width:560px;
+}
+
+.qs-card {
+  padding:14px 16px;
+  background:var(--panel);
+  border:1px solid var(--border2);
+  border-radius:3px;
+  cursor:pointer;
+  text-align:left;
+  transition:all 0.2s;
+  position:relative;
+  overflow:hidden;
+}
+
+.qs-card::before {
+  content:'';
+  position:absolute;
+  top:0; left:0; right:0;
+  height:1px;
+  background:linear-gradient(90deg, transparent, var(--cyan), transparent);
+  opacity:0;
+  transition:opacity 0.2s;
+}
+
+.qs-card:hover { background:var(--panel2); border-color:var(--border3); }
+.qs-card:hover::before { opacity:1; }
+
+.qs-tag {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:8px;
+  letter-spacing:2px;
+  color:var(--cyan);
+  margin-bottom:4px;
+}
+
+.qs-title {
+  font-size:12px;
+  font-weight:600;
+  color:var(--white);
+  margin-bottom:3px;
+}
+
+.qs-desc {
+  font-size:10px;
+  color:var(--gray2);
+  line-height:1.4;
+}
+
+/* Message rows */
+.msg-row {
+  padding:16px 20px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  gap:14px;
+  animation:fade-up 0.25s ease;
+}
+
+@keyframes fade-up {
+  from { opacity:0; transform:translateY(8px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+.msg-row.user-row {
+  background:rgba(0,212,255,0.025);
+  border-left:2px solid var(--cyan2);
+}
+
+.msg-row.ai-row {
+  background:transparent;
+  border-left:2px solid transparent;
+}
+
+.msg-row.ai-row:hover { background:rgba(255,255,255,0.012); }
+
+.msg-avatar {
+  width:28px; height:28px;
+  border-radius:2px;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px;
+  font-weight:700;
+  margin-top:1px;
+}
+
+.user-avatar {
+  background:var(--panel2);
+  border:1px solid var(--border3);
+  color:var(--gray2);
+}
+
+.ai-avatar {
+  background:var(--cyan);
+  color:var(--black);
+}
+
+.msg-body { flex:1; min-width:0; }
+
+.msg-label {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px;
+  letter-spacing:1px;
+  color:var(--gray3);
+  margin-bottom:6px;
+  text-transform:uppercase;
+}
+
+.user-row .msg-label { color:var(--cyan2); }
+
+.msg-text {
+  font-size:13px;
+  line-height:1.65;
+  color:var(--gray1);
+}
+
+.msg-text strong { color:var(--white); font-weight:600; }
+
+.uploaded-img {
+  max-width:280px;
+  max-height:180px;
+  border-radius:2px;
+  border:1px solid var(--border2);
+  object-fit:cover;
+  display:block;
+  margin-bottom:8px;
+}
+
+/* Analysis response blocks */
+.resp-section {
+  margin-bottom:14px;
+}
+
+.resp-section-head {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px;
+  letter-spacing:2.5px;
+  text-transform:uppercase;
+  color:var(--cyan);
+  padding-bottom:5px;
+  border-bottom:1px solid rgba(0,212,255,0.15);
+  margin-bottom:8px;
+}
+
+.resp-table { width:100%; border-collapse:collapse; }
+
+.resp-table td {
+  padding:4px 0;
+  font-size:11px;
+  vertical-align:top;
+}
+
+.resp-table td:first-child {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:10px;
+  color:var(--gray2);
+  width:120px;
+  padding-right:12px;
+}
+
+.level-tag {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:10px;
+  padding:2px 8px;
+  border-radius:1px;
+  font-weight:600;
+}
+
+.tag-sup { background:rgba(0,255,136,0.1); color:var(--green); }
+.tag-res { background:rgba(255,51,85,0.1); color:var(--red); }
+.tag-liq { background:rgba(255,170,0,0.1); color:var(--amber); }
+.tag-bull-b { background:rgba(0,255,136,0.08); border:1px solid rgba(0,255,136,0.25); }
+.tag-bear-b { background:rgba(255,51,85,0.08); border:1px solid rgba(255,51,85,0.25); }
+
+.scenario-box {
+  padding:10px 12px;
+  border-radius:2px;
+  margin-bottom:8px;
+}
+
+.conf-bar-wrap { margin-top:4px; }
+.conf-bar-track {
+  height:3px;
+  background:var(--border);
+  border-radius:2px;
+  overflow:hidden;
+}
+.conf-bar-fill {
+  height:100%;
+  border-radius:2px;
+  background:linear-gradient(90deg, var(--cyan), var(--green));
+  transition:width 1.2s cubic-bezier(0.4,0,0.2,1);
+}
+
+.disclaimer-line {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px;
+  letter-spacing:1px;
+  color:var(--gray3);
+  padding-top:10px;
+  margin-top:10px;
+  border-top:1px solid var(--border);
+}
+
+/* Typing */
+.typing-wrap { padding:16px 20px; display:flex; gap:14px; align-items:flex-start; }
+
+.typing-dots { display:flex; gap:5px; padding-top:6px; }
+
+.typing-dots span {
+  width:5px; height:5px;
+  background:var(--cyan);
+  border-radius:50%;
+  animation:typing 1.3s ease-in-out infinite;
+  opacity:0.5;
+}
+
+.typing-dots span:nth-child(2) { animation-delay:0.2s; }
+.typing-dots span:nth-child(3) { animation-delay:0.4s; }
+
+@keyframes typing {
+  0%,80%,100%{ transform:scale(0.8); opacity:0.3; }
+  40%{ transform:scale(1.3); opacity:1; }
+}
+
+/* ── INPUT BAR ── */
+.input-zone {
+  border-top:1px solid var(--border);
+  background:var(--bg2);
+  padding:12px 16px 14px;
+  flex-shrink:0;
+}
+
+.attachment-preview {
+  display:none;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  background:var(--panel);
+  border:1px solid var(--border2);
+  border-radius:2px;
+  margin-bottom:10px;
+  font-family:'IBM Plex Mono', monospace;
+  font-size:10px;
+  color:var(--gray1);
+}
+
+.attachment-preview.visible { display:flex; }
+
+.attach-thumb {
+  width:36px; height:28px;
+  object-fit:cover;
+  border-radius:1px;
+  border:1px solid var(--border2);
+}
+
+.attach-remove {
+  margin-left:auto;
+  cursor:pointer;
+  color:var(--gray2);
+  font-size:14px;
+  line-height:1;
+}
+.attach-remove:hover { color:var(--red); }
+
+.input-row {
+  display:flex;
+  gap:8px;
+  align-items:flex-end;
+}
+
+.input-field {
+  flex:1;
+  background:var(--panel);
+  border:1px solid var(--border2);
+  border-radius:2px;
+  padding:10px 14px;
+  color:var(--white);
+  font-family:'IBM Plex Sans', sans-serif;
+  font-size:13px;
+  resize:none;
+  outline:none;
+  min-height:42px;
+  max-height:110px;
+  line-height:1.5;
+  transition:border-color 0.2s;
+}
+
+.input-field:focus { border-color:rgba(0,212,255,0.5); }
+.input-field::placeholder { color:var(--gray3); }
+
+.input-side { display:flex; gap:6px; align-items:flex-end; }
+
+.icon-btn {
+  width:42px; height:42px;
+  background:var(--panel);
+  border:1px solid var(--border2);
+  border-radius:2px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--gray2);
+  transition:all 0.15s;
+  font-size:15px;
+}
+
+.icon-btn:hover { border-color:var(--border3); color:var(--white); background:var(--panel2); }
+
+.send-btn {
+  width:42px; height:42px;
+  background:var(--cyan);
+  border:none;
+  border-radius:2px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--black);
+  transition:all 0.18s;
+}
+
+.send-btn:hover {
+  background:#33ddff;
+  box-shadow:0 0 20px rgba(0,212,255,0.4);
+}
+
+.send-btn svg { width:16px; height:16px; }
+
+.input-footer {
+  display:flex;
+  align-items:center;
+  gap:16px;
+  margin-top:8px;
+}
+
+.input-hint {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px;
+  color:var(--gray3);
+  letter-spacing:0.5px;
+  display:flex;
+  align-items:center;
+  gap:5px;
+}
+
+.input-hint-key {
+  padding:1px 5px;
+  background:var(--panel2);
+  border:1px solid var(--border3);
+  border-radius:1px;
+  color:var(--gray2);
+}
+
+/* ── RIGHT PANEL ── */
+.right-panel {
+  width:200px;
+  flex-shrink:0;
+  border-left:1px solid var(--border);
+  display:flex;
+  flex-direction:column;
+  background:var(--panel);
+  overflow:hidden;
+}
+
+.rp-section {
+  border-bottom:1px solid var(--border);
+  padding:10px 12px;
+}
+
+.rp-stat-row {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:5px 0;
+  border-bottom:1px solid var(--border);
+  font-family:'IBM Plex Mono', monospace;
+}
+
+.rp-stat-row:last-child { border-bottom:none; }
+.rp-stat-key { font-size:9px; color:var(--gray2); letter-spacing:0.5px; }
+.rp-stat-val { font-size:10px; font-weight:600; }
+
+.fg-display {
+  text-align:center;
+  padding:8px 0 4px;
+}
+
+.fg-num {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:38px;
+  font-weight:700;
+  color:var(--amber);
+  line-height:1;
+  letter-spacing:-1px;
+}
+
+.fg-word {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px;
+  letter-spacing:2px;
+  color:var(--amber2);
+  margin-top:2px;
+}
+
+.fg-meter {
+  height:4px;
+  background:var(--border);
+  border-radius:2px;
+  margin-top:10px;
+  overflow:hidden;
+  position:relative;
+}
+
+.fg-meter-fill {
+  height:100%;
+  width:62%;
+  background:linear-gradient(90deg, var(--red) 0%, var(--amber) 50%, var(--green) 100%);
+  border-radius:2px;
+}
+
+.fg-meter-cursor {
+  position:absolute;
+  top:-2px;
+  left:62%;
+  width:2px;
+  height:8px;
+  background:var(--white);
+  border-radius:1px;
+  transform:translateX(-50%);
+}
+
+.heatmap-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:4px;
+  margin-top:6px;
+}
+
+.hm-cell {
+  padding:5px 4px;
+  border-radius:1px;
+  text-align:center;
+  cursor:pointer;
+  transition:filter 0.2s;
+}
+
+.hm-cell:hover { filter:brightness(1.3); }
+
+.hm-sym {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:8px;
+  font-weight:700;
+  color:rgba(255,255,255,0.9);
+  margin-bottom:2px;
+}
+
+.hm-pct {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:8px;
+  color:rgba(255,255,255,0.7);
+}
+
+.rp-upgrade {
+  margin:10px;
+  padding:12px;
+  border:1px solid rgba(38,161,123,0.3);
+  border-radius:2px;
+  background:rgba(38,161,123,0.04);
+  text-align:center;
+  flex-shrink:0;
+}
+
+.rp-upgrade-title {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px;
+  letter-spacing:1.5px;
+  color:var(--usdt);
+  margin-bottom:6px;
+}
+
+.rp-upgrade-text {
+  font-size:10px;
+  color:var(--gray2);
+  line-height:1.5;
+  margin-bottom:10px;
+}
+
+/* ══════════════════════════════════════
+   SUBSCRIPTION MODAL
+══════════════════════════════════════ */
+.modal-backdrop {
+  position:fixed;
+  inset:0;
+  background:rgba(2,3,4,0.92);
+  z-index:200;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  backdrop-filter:blur(6px);
+}
+
+.modal-backdrop.open { display:flex; }
+
+.modal-box {
+  background:var(--panel);
+  border:1px solid var(--border2);
+  border-radius:4px;
+  width:min(640px,95vw);
+  max-height:90vh;
+  overflow-y:auto;
+  position:relative;
+  animation:modal-drop 0.28s cubic-bezier(0.4,0,0.2,1);
+}
+
+@keyframes modal-drop {
+  from { opacity:0; transform:translateY(-16px) scale(0.98); }
+  to { opacity:1; transform:none; }
+}
+
+.modal-topbar {
+  padding:16px 20px;
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  background:var(--bg2);
+}
+
+.modal-title {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:14px;
+  font-weight:700;
+  letter-spacing:2px;
+  color:var(--white);
+}
+
+.modal-title span { color:var(--cyan); }
+
+.modal-close-btn {
+  background:none;
+  border:1px solid var(--border2);
+  color:var(--gray2);
+  width:28px; height:28px;
+  border-radius:2px;
+  cursor:pointer;
+  font-size:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:all 0.15s;
+}
+
+.modal-close-btn:hover { border-color:var(--red); color:var(--red); }
+
+.modal-body { padding:20px; }
+
+/* Plan cards */
+.plans-row {
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:10px;
+  margin-bottom:20px;
+}
+
+.plan-card {
+  border:1px solid var(--border2);
+  border-radius:3px;
+  padding:16px 14px;
+  cursor:pointer;
+  transition:all 0.2s;
+  position:relative;
+  background:var(--bg2);
+}
+
+.plan-card:hover { border-color:var(--border3); }
+
+.plan-card.selected {
+  border-color:var(--cyan);
+  background:rgba(0,212,255,0.04);
+}
+
+.plan-card.popular {
+  border-color:rgba(0,212,255,0.4);
+}
+
+.popular-badge {
+  position:absolute;
+  top:-10px;
+  left:50%;
+  transform:translateX(-50%);
+  background:var(--cyan);
+  color:var(--black);
+  font-family:'IBM Plex Mono', monospace;
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:1px;
+  padding:3px 10px;
+  border-radius:10px;
+  white-space:nowrap;
+}
+
+.plan-name {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px;
+  letter-spacing:2px;
+  color:var(--gray2);
+  margin-bottom:8px;
+}
+
+.plan-price-row {
+  display:flex;
+  align-items:baseline;
+  gap:4px;
+  margin-bottom:2px;
+}
+
+.plan-price {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:28px;
+  font-weight:700;
+  color:var(--white);
+  line-height:1;
+}
+
+.plan-currency { font-size:13px; color:var(--gray2); }
+.plan-period { font-size:10px; color:var(--gray3); margin-bottom:12px; font-family:'IBM Plex Mono',monospace; }
+
+.plan-feature {
+  display:flex;
+  align-items:flex-start;
+  gap:6px;
+  font-size:10px;
+  color:var(--gray1);
+  margin-bottom:4px;
+  line-height:1.4;
+}
+
+.plan-feature-icon { color:var(--green); font-size:10px; flex-shrink:0; margin-top:1px; }
+.plan-feature-icon.lock { color:var(--gray3); }
+
+/* Crypto payment section */
+.pay-section {
+  border:1px solid var(--border2);
+  border-radius:3px;
+  overflow:hidden;
+  margin-bottom:16px;
+}
+
+.pay-header {
+  padding:12px 16px;
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.pay-header-icon {
+  width:28px; height:28px;
+  background:rgba(38,161,123,0.15);
+  border:1px solid rgba(38,161,123,0.3);
+  border-radius:2px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+}
+
+.pay-header-text {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:11px;
+  font-weight:600;
+  color:var(--white);
+}
+
+.pay-header-sub {
+  font-size:10px;
+  color:var(--gray2);
+  margin-top:1px;
+}
+
+.pay-body { padding:16px; }
+
+.pay-instructions {
+  font-size:11px;
+  color:var(--gray1);
+  line-height:1.7;
+  margin-bottom:14px;
+}
+
+.pay-instructions strong { color:var(--white); }
+
+.address-box {
+  background:var(--bg);
+  border:1px solid var(--border2);
+  border-radius:2px;
+  padding:12px 14px;
+  margin-bottom:12px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.address-label {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:8px;
+  letter-spacing:2px;
+  color:var(--usdt);
+  margin-bottom:4px;
+}
+
+.address-value {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:10px;
+  color:var(--white);
+  word-break:break-all;
+  line-height:1.5;
+  flex:1;
+}
+
+.copy-btn {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px;
+  padding:5px 10px;
+  background:var(--panel2);
+  border:1px solid var(--border2);
+  border-radius:2px;
+  color:var(--gray1);
+  cursor:pointer;
+  transition:all 0.15s;
+  flex-shrink:0;
+  letter-spacing:1px;
+}
+
+.copy-btn:hover { border-color:var(--cyan); color:var(--cyan); }
+.copy-btn.copied { border-color:var(--green); color:var(--green); }
+
+.qr-area {
+  display:flex;
+  gap:14px;
+  align-items:flex-start;
+  margin-bottom:12px;
+}
+
+.qr-code {
+  width:80px; height:80px;
+  background:var(--white);
+  border-radius:2px;
+  padding:6px;
+  flex-shrink:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.qr-code canvas { display:block; }
+
+.qr-instructions { font-size:10px; color:var(--gray2); line-height:1.6; }
+.qr-instructions strong { color:var(--white); }
+
+.pay-steps {
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.pay-step {
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  font-size:11px;
+  color:var(--gray1);
+}
+
+.step-num {
+  font-family:'IBM Plex Mono', monospace;
+  font-size:9px;
+  font-weight:700;
+  width:20px; height:20px;
+  background:rgba(0,212,255,0.1);
+  border:1px solid rgba(0,212,255,0.2);
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--cyan);
+  flex-shrink:0;
+}
+
+.tx-submit {
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid var(--border);
+}
+
+.tx-input-row {
+  display:flex;
+  gap:8px;
+  margin-top:8px;
+}
+
+.tx-input {
+  flex:1;
+  background:var(--bg);
+  border:1px solid var(--border2);
+  border-radius:2px;
+  padding:8px 12px;
+  color:var(--white);
+  font-family:'IBM Plex Mono', monospace;
+  font-size:10px;
+  outline:none;
+}
+
+.tx-input:focus { border-color:rgba(38,161,123,0.5); }
+.tx-input::placeholder { color:var(--gray3); }
+
+.notice-box {
+  padding:10px 14px;
+  background:rgba(255,170,0,0.05);
+  border:1px solid rgba(255,170,0,0.2);
+  border-radius:2px;
+  font-size:10px;
+  color:var(--amber2);
+  line-height:1.5;
+  margin-top:12px;
+}
+
+/* Model selector */
+.model-modal {
+  position:fixed;
+  inset:0;
+  background:rgba(2,3,4,0.88);
+  z-index:300;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  backdrop-filter:blur(4px);
+}
+
+.model-modal.open { display:flex; }
+
+.model-box {
+  background:var(--panel);
+  border:1px solid var(--border2);
+  border-radius:3px;
+  width:380px;
+  animation:modal-drop 0.2s ease;
+}
+
+.model-row {
+  padding:12px 16px;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  transition:background 0.15s;
+}
+
+.model-row:last-child { border-bottom:none; }
+.model-row:hover { background:var(--panel2); }
+.model-row.active-model { background:rgba(0,212,255,0.05); }
+
+.model-dot {
+  width:8px; height:8px;
+  border-radius:50%;
+  flex-shrink:0;
+}
+
+.model-info { flex:1; }
+.model-name { font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; color:var(--white); }
+.model-desc { font-size:10px; color:var(--gray2); margin-top:2px; }
+.model-badge-free { font-family:'IBM Plex Mono',monospace; font-size:8px; padding:2px 6px; background:rgba(0,255,136,0.1); border:1px solid rgba(0,255,136,0.25); color:var(--green); border-radius:1px; }
+.model-badge-pro { font-family:'IBM Plex Mono',monospace; font-size:8px; padding:2px 6px; background:rgba(0,212,255,0.1); border:1px solid rgba(0,212,255,0.25); color:var(--cyan); border-radius:1px; }
+
+#fileInput { display:none; }
+</style>
+</head>
+<body>
+
+<!-- STATUS BAR -->
+<div class="statusbar">
+  <div class="sb-item">
+    <div class="sb-live"></div>
+    <span>LIVE</span>
+  </div>
+  <div class="sb-item">
+    <span>BTC</span><span class="sb-ticker">$107,420</span>
+    <span class="sb-up">+2.41%</span>
+  </div>
+  <div class="sb-item">
+    <span>ETH</span><span class="sb-ticker">$3,890</span>
+    <span class="sb-up">+1.83%</span>
+  </div>
+  <div class="sb-item">
+    <span>SOL</span><span class="sb-ticker">$182.30</span>
+    <span class="sb-dn">-0.91%</span>
+  </div>
+  <div class="sb-item">
+    <span>BNB</span><span class="sb-ticker">$622</span>
+    <span class="sb-up">+0.54%</span>
+  </div>
+  <div class="sb-item">
+    <span>BTC.D</span><span class="sb-ticker">54.2%</span>
+    <span class="sb-up">▲</span>
+  </div>
+  <div class="sb-item">
+    <span>F&G</span><span class="sb-ticker" style="color:var(--amber)">62 GREED</span>
+  </div>
+  <div class="sb-spacer"></div>
+  <div class="sb-item" id="clock">00:00:00 UTC</div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-wrap">
+    <div class="logo-mark">
+      <svg viewBox="0 0 34 34" fill="none">
+        <polygon points="17,2 32,9.5 32,24.5 17,32 2,24.5 2,9.5"
+          fill="none" stroke="#00d4ff" stroke-width="1.5" opacity="0.4"/>
+        <polygon points="17,6 28,11.5 28,22.5 17,28 6,22.5 6,11.5"
+          fill="rgba(0,212,255,0.08)" stroke="#00d4ff" stroke-width="1"/>
+        <text x="17" y="21" text-anchor="middle" font-family="IBM Plex Mono" font-size="9" font-weight="700" fill="#00d4ff">MM</text>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-name">Market<span>Mind</span></div>
+      <div class="logo-sub">INTELLIGENCE TERMINAL</div>
+    </div>
+  </div>
+
+  <nav class="nav-tabs">
+    <div class="nav-tab active" onclick="switchTab(this,'analysis')">ANALYSIS</div>
+    <div class="nav-tab" onclick="switchTab(this,'charts')">CHARTS</div>
+    <div class="nav-tab" onclick="switchTab(this,'signals')">SIGNALS</div>
+    <div class="nav-tab" onclick="switchTab(this,'onchain')">ON-CHAIN</div>
+  </nav>
+
+  <div class="header-right">
+    <div class="tier-badge" id="tierBadge">FREE TIER</div>
+    <button class="btn btn-outline" onclick="openSubModal()">Subscribe</button>
+    <button class="btn btn-primary" onclick="openSubModal()">PRO ACCESS</button>
+  </div>
+</header>
+
+<!-- WORKSPACE -->
+<div class="workspace">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="panel-header">
+      Watchlist
+      <span class="panel-header-action">+ ADD</span>
+    </div>
+
+    <div class="ticker-list">
+      <div class="ticker-row active" onclick="quickAnalyze(this,'BTC','$107,420','+2.41%')">
+        <span class="tk-symbol">BTC</span>
+        <span class="tk-price">107,420</span>
+        <span class="tk-name">Bitcoin</span>
+        <span class="tk-change up">+2.41%</span>
+      </div>
+      <div class="ticker-row" onclick="quickAnalyze(this,'ETH','$3,890','+1.83%')">
+        <span class="tk-symbol">ETH</span>
+        <span class="tk-price">3,890</span>
+        <span class="tk-name">Ethereum</span>
+        <span class="tk-change up">+1.83%</span>
+      </div>
+      <div class="ticker-row" onclick="quickAnalyze(this,'SOL','$182.30','-0.91%')">
+        <span class="tk-symbol">SOL</span>
+        <span class="tk-price">182.30</span>
+        <span class="tk-name">Solana</span>
+        <span class="tk-change dn">-0.91%</span>
+      </div>
+      <div class="ticker-row" onclick="quickAnalyze(this,'BNB','$622','+0.54%')">
+        <span class="tk-symbol">BNB</span>
+        <span class="tk-price">622.00</span>
+        <span class="tk-name">BNB Chain</span>
+        <span class="tk-change up">+0.54%</span>
+      </div>
+      <div class="ticker-row" onclick="quickAnalyze(this,'ARB','$1.02','-2.10%')">
+        <span class="tk-symbol">ARB</span>
+        <span class="tk-price">1.02</span>
+        <span class="tk-name">Arbitrum</span>
+        <span class="tk-change dn">-2.10%</span>
+      </div>
+      <div class="ticker-row" onclick="quickAnalyze(this,'MATIC','$0.88','+0.32%')">
+        <span class="tk-symbol">MATIC</span>
+        <span class="tk-price">0.88</span>
+        <span class="tk-name">Polygon</span>
+        <span class="tk-change up">+0.32%</span>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+    <div class="panel-header">Live Feed</div>
+
+    <div class="news-feed">
+      <div class="news-row">
+        <div class="news-pill pill-bull">&#9650; BULLISH</div>
+        <div class="news-title">Spot BTC ETF inflows hit $680M single day — BlackRock leads</div>
+        <div class="news-meta">4 MIN AGO · COINDESK</div>
+      </div>
+      <div class="news-row">
+        <div class="news-pill pill-neutral">MACRO</div>
+        <div class="news-title">Fed holds rates. Dot plot shows 2 cuts in 2025</div>
+        <div class="news-meta">18 MIN AGO · REUTERS</div>
+      </div>
+      <div class="news-row">
+        <div class="news-pill pill-bear">&#9660; RISK</div>
+        <div class="news-title">$420M liquidated as BTC rejects ATH — long squeeze</div>
+        <div class="news-meta">34 MIN AGO · COINGLASS</div>
+      </div>
+      <div class="pro-gate">
+        <div class="pro-gate-icon">⬡</div>
+        <div class="pro-gate-text">Real-time news, whale alerts, and on-chain signals require PRO access.</div>
+        <button class="btn-sm btn-usdt" onclick="openSubModal()">UNLOCK WITH USDT</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT CENTER -->
+  <div class="chat-center">
+    <div class="chat-toolbar">
+      <span class="toolbar-label">Terminal</span>
+      <div class="toolbar-chip chip-active">ANALYSIS MODE</div>
+      <div class="toolbar-chip chip-model" id="modelChip" onclick="openModelModal()">
+        ⬡ <span id="modelName">Groq Llama-3</span>
+      </div>
+      <div class="toolbar-spacer"></div>
+      <div class="toolbar-action" onclick="clearChat()">CLEAR</div>
+      <div class="toolbar-action" onclick="openSubModal()">EXPORT</div>
+    </div>
+
+    <div class="messages-wrap" id="msgWrap">
+      <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-graphic">
+          <svg width="96" height="96" viewBox="0 0 96 96">
+            <g class="hex-ring">
+              <polygon points="48,8 88,28 88,68 48,88 8,68 8,28"
+                fill="none" stroke="rgba(0,212,255,0.15)" stroke-width="1" stroke-dasharray="4 4"/>
+            </g>
+            <polygon points="48,18 78,33 78,63 48,78 18,63 18,33"
+              fill="rgba(0,212,255,0.05)" stroke="rgba(0,212,255,0.3)" stroke-width="1.5"/>
+            <polygon points="48,28 68,38 68,58 48,68 28,58 28,38"
+              fill="rgba(0,212,255,0.08)" stroke="#00d4ff" stroke-width="1.5"/>
+            <text x="48" y="53" text-anchor="middle" font-family="IBM Plex Mono" font-size="14" font-weight="700" fill="#00d4ff">MM</text>
+          </svg>
+        </div>
+        <div class="welcome-title">Market<span>Mind</span> AI</div>
+        <div class="welcome-sub">Institutional-grade crypto analysis. Upload charts for visual analysis, or ask about market structure, trade setups, and risk management.</div>
+        <div class="quickstart-grid">
+          <div class="qs-card" onclick="qsend('Perform a complete BTC 4H market structure analysis with trade setup, key levels, and risk parameters.')">
+            <div class="qs-tag">STRUCTURE</div>
+            <div class="qs-title">BTC 4H Analysis</div>
+            <div class="qs-desc">Full market structure, trade scenarios, confidence score</div>
+          </div>
+          <div class="qs-card" onclick="qsend('What is the current ETH bias? Is it a liquidity grab or continuation? Give me key levels.')">
+            <div class="qs-tag">LEVELS</div>
+            <div class="qs-title">ETH Bias + Levels</div>
+            <div class="qs-desc">Current bias, support/resistance, invalidation zones</div>
+          </div>
+          <div class="qs-card" onclick="qsend('Is BTC dominance expanding or contracting? What does this mean for altcoins and portfolio positioning?')">
+            <div class="qs-tag">DOMINANCE</div>
+            <div class="qs-title">BTC.D Context</div>
+            <div class="qs-desc">Dominance analysis and altcoin implications</div>
+          </div>
+          <div class="qs-card" onclick="qsend('Give me a complete SOL trade signal with entry, stop loss, take profit targets, and risk-to-reward ratio.')">
+            <div class="qs-tag">SIGNAL</div>
+            <div class="qs-title">SOL Trade Signal</div>
+            <div class="qs-desc">Entry, SL, TP levels, R:R estimation</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INPUT -->
+    <div class="input-zone">
+      <div class="attachment-preview" id="attachPreview">
+        <img id="attachThumb" class="attach-thumb" src="" alt="">
+        <span style="font-size:10px;color:var(--gray1);">Chart attached — ready for visual analysis</span>
+        <span class="attach-remove" onclick="removeAttachment()">✕</span>
+      </div>
+      <div class="input-row">
+        <textarea
+          id="inputField"
+          class="input-field"
+          placeholder="Ask about BTC, ETH, SOL... or upload a chart for analysis"
+          rows="1"
+          onkeydown="handleKey(event)"
+          oninput="autoResize(this)"></textarea>
+        <div class="input-side">
+          <button class="icon-btn" onclick="document.getElementById('fileInput').click()" title="Upload chart">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+              <polyline points="17 8 12 3 7 8"/>
+              <line x1="12" y1="3" x2="12" y2="15"/>
+            </svg>
+          </button>
+          <button class="send-btn" onclick="sendMsg()" title="Send">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="22" y1="2" x2="11" y2="13"/>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="input-footer">
+        <span class="input-hint"><span class="input-hint-key">↵</span> SEND</span>
+        <span class="input-hint"><span class="input-hint-key">⇧↵</span> NEW LINE</span>
+        <span class="input-hint">📎 ATTACH CHART</span>
+        <span class="input-hint" style="margin-left:auto;color:var(--gray3);">MARKETS ARE PROBABILISTIC — MANAGE RISK</span>
+      </div>
+    </div>
+    <input type="file" id="fileInput" accept="image/*" onchange="onFileSelect(event)">
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+    <div class="rp-section">
+      <div class="panel-header" style="padding:0 0 8px;background:none;border:none;">Market Data</div>
+      <div class="rp-stat-row">
+        <span class="rp-stat-key">TOTAL MCAP</span>
+        <span class="rp-stat-val">$3.61T</span>
+      </div>
+      <div class="rp-stat-row">
+        <span class="rp-stat-key">24H VOL</span>
+        <span class="rp-stat-val">$118.4B</span>
+      </div>
+      <div class="rp-stat-row">
+        <span class="rp-stat-key">BTC OI</span>
+        <span class="rp-stat-val">$32.4B</span>
+      </div>
+      <div class="rp-stat-row">
+        <span class="rp-stat-key">FUNDING</span>
+        <span class="rp-stat-val up">+0.015%</span>
+      </div>
+      <div class="rp-stat-row">
+        <span class="rp-stat-key">LONGS/SHORTS</span>
+        <span class="rp-stat-val">54/46</span>
+      </div>
+      <div class="rp-stat-row">
+        <span class="rp-stat-key">BTC BVOL</span>
+        <span class="rp-stat-val" style="color:var(--amber)">48.2</span>
+      </div>
+      <div class="rp-stat-row">
+        <span class="rp-stat-key">REGIME</span>
+        <span class="rp-stat-val" style="color:var(--cyan)">EXPAND</span>
+      </div>
+    </div>
+
+    <div class="rp-section">
+      <div class="panel-header" style="padding:0 0 8px;background:none;border:none;">Fear &amp; Greed</div>
+      <div class="fg-display">
+        <div class="fg-num">62</div>
+        <div class="fg-word">GREED</div>
+        <div class="fg-meter">
+          <div class="fg-meter-fill"></div>
+          <div class="fg-meter-cursor"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rp-section">
+      <div class="panel-header" style="padding:0 0 8px;background:none;border:none;">24H Heatmap</div>
+      <div class="heatmap-grid">
+        <div class="hm-cell" style="background:rgba(0,255,136,0.25)"><div class="hm-sym">BTC</div><div class="hm-pct">+2.4%</div></div>
+        <div class="hm-cell" style="background:rgba(0,255,136,0.2)"><div class="hm-sym">ETH</div><div class="hm-pct">+1.8%</div></div>
+        <div class="hm-cell" style="background:rgba(255,51,85,0.2)"><div class="hm-sym">SOL</div><div class="hm-pct">-0.9%</div></div>
+        <div class="hm-cell" style="background:rgba(0,255,136,0.12)"><div class="hm-sym">BNB</div><div class="hm-pct">+0.5%</div></div>
+        <div class="hm-cell" style="background:rgba(255,51,85,0.25)"><div class="hm-sym">ARB</div><div class="hm-pct">-2.1%</div></div>
+        <div class="hm-cell" style="background:rgba(0,255,136,0.08)"><div class="hm-sym">MATIC</div><div class="hm-pct">+0.3%</div></div>
+      </div>
+    </div>
+
+    <div class="rp-upgrade">
+      <div class="rp-upgrade-title">⬡ PRO FEATURES</div>
+      <div class="rp-upgrade-text">Whale tracker, on-chain alerts, derivatives flow, daily edge reports.</div>
+      <button class="btn-sm btn-usdt" onclick="openSubModal()">PAY WITH USDT</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ SUBSCRIPTION MODAL ══ -->
+<div class="modal-backdrop" id="subModal">
+  <div class="modal-box">
+    <div class="modal-topbar">
+      <div class="modal-title">Unlock <span>MarketMind</span> PRO</div>
+      <button class="modal-close-btn" onclick="closeSubModal()">✕</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Plans -->
+      <div class="plans-row">
+        <div class="plan-card" onclick="selectPlan(this,29)">
+          <div class="plan-name">BASIC</div>
+          <div class="plan-price-row"><span class="plan-currency">$</span><span class="plan-price">29</span></div>
+          <div class="plan-period">/ MONTH</div>
+          <div class="plan-feature"><span class="plan-feature-icon">✓</span>50 AI analyses/mo</div>
+          <div class="plan-feature"><span class="plan-feature-icon">✓</span>News feed access</div>
+          <div class="plan-feature"><span class="plan-feature-icon">✓</span>Chart uploads</div>
+          <div class="plan-feature"><span class="plan-feature-icon lock">✕</span>On-chain alerts</div>
+          <div class="plan-feature"><span class="plan-feature-icon lock">✕</span>Whale tracker</div>
+        </div>
+        <div class="plan-card popular selected" onclick="selectPlan(this,79)">
+          <div class="popular-badge">MOST POPULAR</div>
+          <div class="plan-name">PRO</div>
+          <div class="plan-price-row"><span class="plan-currency">$</span><span class="plan-price">79</span></div>
+          <div class="plan-period">/ MONTH</div>
+          <div class="plan-feature"><span class="plan-feature-icon">✓</span>Unlimited analyses</div>
+          <div class="plan-feature"><span class="plan-feature-icon">✓</span>Real-time alerts</div>
+          <div class="plan-feature"><span class="plan-feature-icon">✓</span>Whale tracker</div>
+          <div class="plan-feature"><span class="plan-feature-icon">✓</span>Derivatives data</div>
+          <div class="plan-feature"><span class="plan-feature-icon">✓</span>Daily edge report</div>
+        </div>
+        <div class="plan-card" onclick="selectPlan(this,199)">
+          <div class="plan-name">INSTITUTIONAL</div>
+          <div class="plan-price-row"><span class="plan-currency">$</span><span class="plan-price">199</span></div>
+          <div class="plan-period">/ MONTH</div>
+          <div class="plan-feature"><span class="plan-feature-icon">✓</span>Everything in PRO</div>
+          <div class="plan-feature"><span class="plan-feature-icon">✓</span>API access</div>
+          <div class="plan-feature"><span class="plan-feature-icon">✓</span>Custom alerts</div>
+          <div class="plan-feature"><span class="plan-feature-icon">✓</span>Priority support</div>
+          <div class="plan-feature"><span class="plan-feature-icon">✓</span>White-label option</div>
+        </div>
+      </div>
+
+      <!-- Crypto Payment -->
+      <div class="pay-section">
+        <div class="pay-header">
+          <div class="pay-header-icon">₮</div>
+          <div>
+            <div class="pay-header-text">Pay with USDT (BEP20 / BSC)</div>
+            <div class="pay-header-sub">Binance Smart Chain — instant, no middleman</div>
+          </div>
+        </div>
+        <div class="pay-body">
+          <div class="pay-instructions">
+            Send exactly <strong id="payAmount">$79.00 USDT</strong> to the address below on the <strong>BNB Smart Chain (BEP20)</strong> network. After payment, paste your transaction hash to activate your subscription instantly.
+          </div>
+
+          <div class="address-box">
+            <div style="flex:1">
+              <div class="address-label">USDT BEP20 — BSC NETWORK ONLY</div>
+              <div class="address-value" id="walletAddress">0x9d1245528d2ed84f70f39d418ebb0f778827bc8c</div>
+            </div>
+            <button class="copy-btn" id="copyBtn" onclick="copyAddress()">COPY</button>
+          </div>
+
+          <div class="qr-area">
+            <div class="qr-code">
+              <canvas id="qrCanvas" width="68" height="68"></canvas>
+            </div>
+            <div>
+              <div class="qr-instructions">
+                <strong>Scan with Trust Wallet or MetaMask</strong><br><br>
+                Network: <strong>BNB Smart Chain</strong><br>
+                Token: <strong>USDT (BEP20)</strong><br>
+                Amount: <strong id="qrAmount">79 USDT</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="pay-steps">
+            <div class="pay-step">
+              <div class="step-num">1</div>
+              <span>Open your wallet (Trust Wallet, MetaMask, Binance). Switch to <strong>BNB Smart Chain</strong> network.</span>
+            </div>
+            <div class="pay-step">
+              <div class="step-num">2</div>
+              <span>Send exactly <strong id="stepAmount">79 USDT</strong> (BEP20) to the address above. Do NOT send on ETH or TRX network.</span>
+            </div>
+            <div class="pay-step">
+              <div class="step-num">3</div>
+              <span>Copy your BSCScan transaction hash and paste it below. Access activates within minutes.</span>
+            </div>
+          </div>
+
+          <div class="tx-submit">
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--gray2);letter-spacing:1px;">SUBMIT TRANSACTION HASH</div>
+            <div class="tx-input-row">
+              <input type="text" class="tx-input" id="txHash" placeholder="0x... (paste your BSCScan tx hash here)">
+              <button class="btn btn-usdt" onclick="submitTx()" style="padding:8px 16px;font-size:10px;">VERIFY</button>
+            </div>
+          </div>
+
+          <div class="notice-box">
+            ⚠ Only send USDT on <strong>BNB Smart Chain (BEP20)</strong>. Sending on the wrong network will result in permanent loss of funds. Verify the network before confirming.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODEL MODAL ══ -->
+<div class="model-modal" id="modelModal">
+  <div class="model-box">
+    <div class="modal-topbar">
+      <div class="modal-title">Select <span>AI Model</span></div>
+      <button class="modal-close-btn" onclick="closeModelModal()">✕</button>
+    </div>
+    <div class="model-row active-model" onclick="setModel('groq','Groq Llama-3 70B','#00ff88')">
+      <div class="model-dot" style="background:#00ff88;box-shadow:0 0 6px #00ff88"></div>
+      <div class="model-info">
+        <div class="model-name">Groq Llama-3 70B</div>
+        <div class="model-desc">Ultra-fast inference, 70B parameter model. Best for real-time analysis.</div>
+      </div>
+      <span class="model-badge-free">FREE</span>
+    </div>
+    <div class="model-row" onclick="setModel('groq-8b','Groq Llama-3 8B','#00ff88')">
+      <div class="model-dot" style="background:#00cc6a"></div>
+      <div class="model-info">
+        <div class="model-name">Groq Llama-3 8B</div>
+        <div class="model-desc">Fastest response. Ideal for quick structure checks and scalps.</div>
+      </div>
+      <span class="model-badge-free">FREE</span>
+    </div>
+    <div class="model-row" onclick="setModel('groq-mix','Groq Mixtral 8x7B','#00ff88')">
+      <div class="model-dot" style="background:#00aaaa"></div>
+      <div class="model-info">
+        <div class="model-name">Groq Mixtral 8x7B</div>
+        <div class="model-desc">Mixture-of-experts. Strong multi-asset reasoning and macro context.</div>
+      </div>
+      <span class="model-badge-free">FREE</span>
+    </div>
+    <div class="model-row" onclick="openSubModal()">
+      <div class="model-dot" style="background:#00d4ff;box-shadow:0 0 6px #00d4ff"></div>
+      <div class="model-info">
+        <div class="model-name">Claude Sonnet</div>
+        <div class="model-desc">Best-in-class chart analysis and complex derivatives reasoning.</div>
+      </div>
+      <span class="model-badge-pro">PRO</span>
+    </div>
+    <div class="model-row" onclick="openSubModal()">
+      <div class="model-dot" style="background:#aa88ff"></div>
+      <div class="model-info">
+        <div class="model-name">GPT-4o Vision</div>
+        <div class="model-desc">Advanced chart vision. Best for pattern recognition on uploaded charts.</div>
+      </div>
+      <span class="model-badge-pro">PRO</span>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── STATE ───────────────────────────────────────
+const WALLET = '0x9d1245528d2ed84f70f39d418ebb0f778827bc8c';
+const GROQ_MODELS = {
+  'groq': 'llama3-70b-8192',
+  'groq-8b': 'llama3-8b-8192',
+  'groq-mix': 'mixtral-8x7b-32768'
+};
+
+// Replace with your Groq API key — free at console.groq.com
+const GROQ_API_KEY = 'YOUR_GROQ_API_KEY_HERE';
+
+let currentModel = 'groq';
+let selectedPlanAmount = 79;
+let attachedImage = null;
+let attachedBase64 = null;
+let chatHistory = [];
+let isGenerating = false;
+
+// ─── CLOCK ───────────────────────────────────────
+function updateClock() {
+  const now = new Date();
+  const t = now.toUTCString().split(' ')[4];
+  document.getElementById('clock').textContent = t + ' UTC';
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ─── TABS ────────────────────────────────────────
+function switchTab(el, tab) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ─── TICKER CLICK ────────────────────────────────
+function quickAnalyze(el, sym, price, chg) {
+  document.querySelectorAll('.ticker-row').forEach(r => r.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('inputField').value =
+    `Analyze ${sym} ${price} (${chg} 24h) — provide full market structure, trade scenarios with entry/SL/TP, and confidence score.`;
+  document.getElementById('inputField').focus();
+}
+
+// ─── QUICK SEND ──────────────────────────────────
+function qsend(text) {
+  document.getElementById('inputField').value = text;
+  sendMsg();
+}
+
+// ─── MODEL ───────────────────────────────────────
+function openModelModal() { document.getElementById('modelModal').classList.add('open'); }
+function closeModelModal() { document.getElementById('modelModal').classList.remove('open'); }
+
+function setModel(id, name, color) {
+  currentModel = id;
+  document.getElementById('modelName').textContent = name;
+  document.getElementById('modelChip').style.color = color;
+  closeModelModal();
+  document.querySelectorAll('.model-row').forEach(r => r.classList.remove('active-model'));
+  event.currentTarget.classList.add('active-model');
+}
+
+// ─── SUBSCRIPTION MODAL ──────────────────────────
+function openSubModal() {
+  document.getElementById('subModal').classList.add('open');
+  drawQR();
+}
+
+function closeSubModal() {
+  document.getElementById('subModal').classList.remove('open');
+}
+
+document.getElementById('subModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('subModal')) closeSubModal();
+});
+
+function selectPlan(el, amount) {
+  selectedPlanAmount = amount;
+  document.querySelectorAll('.plan-card').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('payAmount').textContent = `$${amount}.00 USDT`;
+  document.getElementById('qrAmount').textContent = `${amount} USDT`;
+  document.getElementById('stepAmount').textContent = `${amount} USDT`;
+  drawQR();
+}
+
+function copyAddress() {
+  navigator.clipboard.writeText(WALLET).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'COPIED';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'COPY'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+function submitTx() {
+  const hash = document.getElementById('txHash').value.trim();
+  if (!hash.startsWith('0x') || hash.length < 60) {
+    alert('Please enter a valid BSCScan transaction hash starting with 0x');
+    return;
+  }
+  closeSubModal();
+  document.getElementById('tierBadge').textContent = 'PRO';
+  document.getElementById('tierBadge').style.color = 'var(--green)';
+  document.getElementById('tierBadge').style.borderColor = 'rgba(0,255,136,0.4)';
+  document.getElementById('tierBadge').style.background = 'rgba(0,255,136,0.08)';
+  addAIMsg('PRO access activated. Transaction verified on BNB Smart Chain. All features are now unlocked — unlimited analyses, real-time news feed, whale tracker, and daily edge reports.\n\nMarkets are probabilistic. Manage risk accordingly.');
+}
+
+// Simple QR code generator (no library — pure canvas)
+function drawQR() {
+  const c = document.getElementById('qrCanvas');
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0,0,68,68);
+  ctx.fillStyle = '#000000';
+  // Draw a simple placeholder pattern
+  const data = WALLET + ':' + selectedPlanAmount;
+  const s = 4;
+  ctx.fillRect(0,0,7*s,7*s);
+  ctx.fillStyle='#fff';
+  ctx.fillRect(s,s,5*s,5*s);
+  ctx.fillStyle='#000';
+  ctx.fillRect(2*s,2*s,3*s,3*s);
+  ctx.fillStyle='#000';
+  ctx.fillRect(10*s,0,7*s,7*s);
+  ctx.fillStyle='#fff';
+  ctx.fillRect(11*s,s,5*s,5*s);
+  ctx.fillStyle='#000';
+  ctx.fillRect(12*s,2*s,3*s,3*s);
+  ctx.fillStyle='#000';
+  ctx.fillRect(0,10*s,7*s,7*s);
+  ctx.fillStyle='#fff';
+  ctx.fillRect(s,11*s,5*s,5*s);
+  ctx.fillStyle='#000';
+  ctx.fillRect(2*s,12*s,3*s,3*s);
+  // middle dots
+  let hash = 0;
+  for(let i=0;i<data.length;i++) hash = ((hash<<5)-hash)+data.charCodeAt(i)|0;
+  ctx.fillStyle='#000';
+  for(let r=0;r<17;r++){
+    for(let cl=0;cl<17;cl++){
+      if(r<7&&cl<7) continue;
+      if(r<7&&cl>9) continue;
+      if(r>9&&cl<7) continue;
+      if((hash^(r*17+cl)*2654435761)&1)
+        ctx.fillRect((cl)*s,(r)*s,s,s);
+    }
+  }
+}
+
+// ─── FILE UPLOAD ─────────────────────────────────
+function onFileSelect(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    attachedBase64 = ev.target.result.split(',')[1];
+    attachedImage = ev.target.result;
+    document.getElementById('attachThumb').src = attachedImage;
+    document.getElementById('attachPreview').classList.add('visible');
+    document.getElementById('inputField').placeholder = 'Chart attached — describe what analysis you need...';
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+}
+
+function removeAttachment() {
+  attachedImage = null;
+  attachedBase64 = null;
+  document.getElementById('attachPreview').classList.remove('visible');
+  document.getElementById('inputField').placeholder = 'Ask about BTC, ETH, SOL... or upload a chart for analysis';
+}
+
+// ─── INPUT UTILS ─────────────────────────────────
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 110) + 'px';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMsg();
+  }
+}
+
+function clearChat() {
+  chatHistory = [];
+  const wrap = document.getElementById('msgWrap');
+  wrap.innerHTML = '';
+  const ws = document.createElement('div');
+  ws.className = 'welcome-screen';
+  ws.id = 'welcomeScreen';
+  ws.innerHTML = `
+    <div class="welcome-graphic">
+      <svg width="96" height="96" viewBox="0 0 96 96">
+        <polygon points="48,18 78,33 78,63 48,78 18,63 18,33" fill="rgba(0,212,255,0.05)" stroke="rgba(0,212,255,0.3)" stroke-width="1.5"/>
+        <text x="48" y="53" text-anchor="middle" font-family="IBM Plex Mono" font-size="14" font-weight="700" fill="#00d4ff">MM</text>
+      </svg>
+    </div>
+    <div class="welcome-title">Market<span>Mind</span> AI</div>
+    <div class="welcome-sub">Terminal cleared. Ready for next analysis session.</div>`;
+  wrap.appendChild(ws);
+}
+
+// ─── SEND MESSAGE ────────────────────────────────
+async function sendMsg() {
+  if (isGenerating) return;
+  const field = document.getElementById('inputField');
+  const text = field.value.trim();
+  if (!text && !attachedImage) return;
+
+  // Remove welcome
+  const ws = document.getElementById('welcomeScreen');
+  if (ws) ws.remove();
+
+  addUserMsg(text, attachedImage);
+
+  const userText = text;
+  const imgB64 = attachedBase64;
+  const imgPrev = attachedImage;
+
+  field.value = '';
+  field.style.height = 'auto';
+  removeAttachment();
+
+  const typing = addTyping();
+  isGenerating = true;
+
+  try {
+    const systemPrompt = `You are MarketMind AI, an institutional-grade crypto and derivatives market analyst. Respond like a professional hedge fund analyst — precise, structured, risk-aware, probability-driven.
+
+ALWAYS structure responses as:
+**1) MARKET OVERVIEW**
+Bias: Bullish/Bearish/Neutral | Structure: Trend/Range/Breakout/Distribution/Accumulation | Volatility: Low/Expanding/Extreme
+
+**2) KEY TECHNICAL LEVELS**
+List major support, resistance, liquidity zones, and invalidations with specific price levels in bold.
+
+**3) TRADE SCENARIOS**
+**A) BULLISH:** Entry logic | Invalidation | Target 1 | Target 2 | Risk-Reward
+**B) BEARISH:** Entry logic | Invalidation | Target 1 | Target 2 | Risk-Reward
+
+**4) RISK ASSESSMENT**
+Key risks, macro/liquidity risks, overextended conditions.
+
+**5) CONFIDENCE SCORE**
+X/10 — brief explanation.
+
+**6) TLDR**
+3-5 bullet points maximum.
+
+Rules: Never guarantee outcomes. No emojis. No hype. Bold key price levels. If chart uploaded, identify: trend direction, breakout/breakdown, range structure, S/R, liquidity sweeps, volume behavior. End every response with: "Markets are probabilistic. Manage risk accordingly."`;
+
+    const messages = [...chatHistory];
+    const newMsg = { role: 'user', content: userText || 'Analyze this chart.' };
+    messages.push(newMsg);
+    chatHistory.push(newMsg);
+
+    // Call Groq (free, fast)
+    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${GROQ_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: GROQ_MODELS[currentModel] || 'llama3-70b-8192',
+        max_tokens: 1200,
+        temperature: 0.4,
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...messages.map(m => ({
+            role: m.role,
+            content: m.role === 'user' && imgB64 && messages.indexOf(m) === messages.length - 1
+              ? [
+                  { type: 'text', text: m.content },
+                  { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${imgB64}` } }
+                ]
+              : m.content
+          }))
+        ]
+      })
+    });
+
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content
+      || data.error?.message
+      || 'Analysis unavailable. Check your Groq API key in the code.';
+
+    chatHistory.push({ role: 'assistant', content: reply });
+
+    typing.remove();
+    isGenerating = false;
+    addAIMsg(reply);
+
+  } catch (err) {
+    typing.remove();
+    isGenerating = false;
+    addAIMsg(`Connection error: ${err.message}\n\n**Setup required:** Replace YOUR_GROQ_API_KEY_HERE in the code with your free key from console.groq.com\n\nMarkets are probabilistic. Manage risk accordingly.`);
+  }
+}
+
+// ─── ADD MESSAGES ────────────────────────────────
+function addUserMsg(text, imgSrc) {
+  const wrap = document.getElementById('msgWrap');
+  const d = document.createElement('div');
+  d.className = 'msg-row user-row';
+  d.innerHTML = `
+    <div class="msg-avatar user-avatar">YOU</div>
+    <div class="msg-body">
+      <div class="msg-label">USER — ${new Date().toUTCString().split(' ')[4]} UTC</div>
+      <div class="msg-text">
+        ${imgSrc ? `<img src="${imgSrc}" class="uploaded-img" alt="Chart">` : ''}
+        ${text ? esc(text) : ''}
+      </div>
+    </div>`;
+  wrap.appendChild(d);
+  scroll();
+}
+
+function addAIMsg(text) {
+  const wrap = document.getElementById('msgWrap');
+  const d = document.createElement('div');
+  d.className = 'msg-row ai-row';
+  d.innerHTML = `
+    <div class="msg-avatar ai-avatar">MM</div>
+    <div class="msg-body">
+      <div class="msg-label">MARKETMIND AI — ${document.getElementById('modelName').textContent.toUpperCase()}</div>
+      <div class="msg-text">${fmt(text)}</div>
+    </div>`;
+  wrap.appendChild(d);
+  scroll();
+}
+
+function addTyping() {
+  const wrap = document.getElementById('msgWrap');
+  const d = document.createElement('div');
+  d.className = 'typing-wrap';
+  d.innerHTML = `
+    <div class="msg-avatar ai-avatar">MM</div>
+    <div class="typing-dots"><span></span><span></span><span></span></div>`;
+  wrap.appendChild(d);
+  scroll();
+  return d;
+}
+
+// ─── TEXT FORMATTING ─────────────────────────────
+function esc(t) {
+  const d = document.createElement('div');
+  d.appendChild(document.createTextNode(t));
+  return d.innerHTML;
+}
+
+function fmt(text) {
+  text = esc(text);
+  // Bold **text**
+  text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  // Headers ##
+  text = text.replace(/^#{1,3}\s+(.+)$/gm,
+    '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:9px;letter-spacing:2.5px;text-transform:uppercase;color:var(--cyan);padding:12px 0 5px;border-bottom:1px solid rgba(0,212,255,0.15);margin-bottom:6px;">$1</div>');
+  // Numbered section headers like "1)" or "**1)"
+  text = text.replace(/^(\d+\))\s(.+)$/gm,
+    '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--cyan);padding:10px 0 4px;border-bottom:1px solid rgba(0,212,255,0.1);margin-bottom:5px;">$1 $2</div>');
+  // Bullet points
+  text = text.replace(/^[-•]\s+(.+)$/gm,
+    '<div style="display:flex;gap:8px;padding:3px 0;font-size:12px;"><span style="color:var(--cyan);flex-shrink:0;margin-top:1px;">—</span><span>$1</span></div>');
+  // Disclaimer
+  text = text.replace(/(Markets are probabilistic\. Manage risk accordingly\.)/g,
+    '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:9px;letter-spacing:1px;color:var(--gray3);padding-top:12px;margin-top:8px;border-top:1px solid var(--border);">$1</div>');
+  // Line breaks
+  text = text.replace(/\n/g, '<br>');
+  return text;
+}
+
+function scroll() {
+  const w = document.getElementById('msgWrap');
+  w.scrollTop = w.scrollHeight;
+}
+</script>
+</body>
+</html>
